@@ -1,13 +1,13 @@
 # Redis+Sentinel+Docker=:heart:
 
-[Tired of trying to get Redis, Sentinel and Docker to work together?](https://redis.io/topics/sentinel#sentinel-docker-nat-and-possible-issues)
+[Tired of trying to make Redis, Sentinel and Docker work together?](https://redis.io/topics/sentinel#sentinel-docker-nat-and-possible-issues)
 
-First, I simply tried to link a docker Redis with a docker sentinel.
-Sadely, Sentinel broadcast the internal ip of the Redis :-/
+First, I simply linked a containerized Redis with a sentinel.
+Sadely, Sentinel broadcasts the Redis internal IP >:-[
 
-So,  I tried the `host mode` of Docker, but it doesn't work on MacOS.
+So, I tried to use the `host mode` of Docker, but it doesn't work on MacOS.
 
-Since my need is to develop locally with an single Redis configuration, i wrote a tiny sentinel server that responds naively.
+Since my need is to develop with an single Redis, i wrote a tiny sentinel server that responds naively.
 
 Battle tested with [ioredis](https://ioredis.readthedocs.io/en/stable/README/).
 
@@ -35,7 +35,7 @@ localhost:26379> sentinel get-master-addr-by-name redis-cluster-master
 ```
 var redis = new Redis({
   sentinels: [{ host: 'localhost', port: 26379 }],
-  name: 'redis-cluster-name'
+  name: 'redis-cluster-master'
 });
 redis.set('foo', 'bar');
 ```
