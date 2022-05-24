@@ -1,13 +1,13 @@
 # Redis+Sentinel+Docker=:heart:
 
-[Tired of trying to get Redis, Sentinel and Docker to work together?](https://redis.io/topics/sentinel#sentinel-docker-nat-and-possible-issues)
+[Tired of trying to make Redis, Sentinel and Docker work together?](https://redis.io/topics/sentinel#sentinel-docker-nat-and-possible-issues)
 
-First, I simply tried to link a docker Redis with a docker sentinel.
-Sadely, Sentinel broadcast the internal ip of the Redis :-/
+First, I simply linked a containerized Redis with a sentinel.
+Sadely, Sentinel broadcasts the Redis internal IP >:-[
 
-So,  I tried the `host mode` of Docker, but it doesn't work on MacOS.
+So, I tried to use the `host mode` of Docker, but it doesn't work on MacOS.
 
-Since my need is to develop locally with an single Redis configuration, i wrote a tiny sentinel server that responds naively.
+Since my need is to develop with an single Redis, i wrote a tiny sentinel server that responds naively.
 
 Battle tested with [ioredis](https://ioredis.readthedocs.io/en/stable/README/).
 
@@ -19,23 +19,33 @@ Battle tested with [ioredis](https://ioredis.readthedocs.io/en/stable/README/).
 > docker-compose up
 ```
 
-## With redis-cli
-
-```
-▶ redis-cli -h localhost -p 26379
-localhost:26379> ping
-PONG
-localhost:26379> sentinel get-master-addr-by-name redis-cluster-master
-1) "127.0.0.1"
-2) "6379"
-```
-
 ## Example of client configuration :
 
 ```
 var redis = new Redis({
   sentinels: [{ host: 'localhost', port: 26379 }],
-  name: 'redis-cluster-name'
+  name: 'master-group-name'
 });
 redis.set('foo', 'bar');
 ```
+
+A full example is available on `example`.
+
+```
+$> cd example
+$> npm install
+$> npm start run
+
+// should display
+> example@1.0.0 start
+> node test.js "run"
+
+bar
+```
+
+You could replace `master-group-name` by your own "master group name".
+You should rename files :
+- "sentinel-get-master-addr-by-name-master-group-name"
+- "sentinel-sentinels-master-group-name"
+
+by you own group name. :)
