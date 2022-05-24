@@ -1,13 +1,20 @@
-# Redis+Sentinel+Docker=:heart:
+# Redis + Sentinel + Docker = :heart:
 
-[Tired of trying to make Redis, Sentinel and Docker work together?](https://redis.io/topics/sentinel#sentinel-docker-nat-and-possible-issues)
+[Tired of trying to make Redis, Sentinel and Docker work together?](https://redis.io/docs/manual/sentinel/#sentinel-docker-nat-and-possible-issues)
 
-First, I simply linked a containerized Redis with a sentinel.
-Sadely, Sentinel broadcasts the Redis internal IP >:-[
+As Developer, it's frustrating to deal with Redis configuration.
+Locally you should have a single Redis instance and in production we have to handle a connection with Sentinel.
+Unfortunately, most of Redis clients do not offer a single way to configure Redis and Sentinel.
 
-So, I tried to use the `host mode` of Docker, but it doesn't work on MacOS.
+And, if you work on MacOS (and M1) you hit the jackpot!
 
-Since my need is to develop with an single Redis, i wrote a tiny sentinel server that responds naively.
+In fact, [Sentinel does only one thing](https://redis.io/docs/manual/sentinel/), it ensures to always maintain integrity between clients and a Redis Master/Replicas. The client connects to the sentinel and asks two things :
+- [the current current master address](https://redis.io/docs/manual/sentinel/#obtaining-the-address-of-the-current-master)
+- the current sentinel configuration
+  
+If you answer correctly to these two questions, your client will switch and connect to the correct Redis instance.
+  
+So the main objective was to mock this handshake and return "localhost:6379" as the current Redis Master.
 
 Battle tested with [ioredis](https://ioredis.readthedocs.io/en/stable/README/).
 
