@@ -1,10 +1,10 @@
-FROM ruby:alpine
+FROM golang:1.18-alpine AS builder
+COPY sentinel.go /
+RUN go build /sentinel.go
 
-COPY sentinel.rb /sentinel.rb
-COPY command /command
-COPY ping /ping
-COPY sentinel-get-master-addr-by-name-redis-cluster-master /sentinel-get-master-addr-by-name-redis-cluster-master
-COPY sentinel-sentinels-redis-cluster-master /sentinel-sentinels-redis-cluster-master
-
+FROM alpine
 EXPOSE 26379
-CMD ["ruby", "/sentinel.rb"]
+COPY sentinel-get-master-addr-by-name-master-group-name /.
+COPY sentinel-sentinels-master-group-name /.
+COPY --from=builder /go/sentinel /sentinel
+CMD ["/sentinel"]

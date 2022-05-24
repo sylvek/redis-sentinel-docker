@@ -6,11 +6,12 @@ import (
 	"io/ioutil"
 	"log"
 	"net"
+	"strconv"
 	"strings"
 )
 
 const (
-	CONN_HOST = "localhost"
+	CONN_HOST = "0.0.0.0"
 	CONN_PORT = "26379"
 	CONN_TYPE = "tcp"
 )
@@ -41,20 +42,31 @@ func handleConnection(conn net.Conn) {
 
 	for s.Scan() {
 		data := s.Text()
-		log.Println(data)
-		if !strings.HasPrefix(data, "*") && !strings.HasPrefix(data, "$") {
-			handleCommand(data, conn)
+
+		if strings.HasPrefix(data, "*") {
+			numberOfParameters, _ := strconv.Atoi(data[1:])
+			parameters := []string{}
+			for s.Scan() {
+				parameter := s.Text()
+				if !strings.HasPrefix(parameter, "$") {
+					parameters = append(parameters, parameter)
+				}
+				if len(parameters) == numberOfParameters {
+					break
+				}
+			}
+			handleCommand(strings.Join(parameters, "-"), conn)
 		}
 	}
 }
 
 func handleCommand(inp string, conn net.Conn) {
 	command := strings.ToLower(inp)
+	log.Printf("> %s", command)
 
 	result, err := ioutil.ReadFile(command)
 	if err == nil {
-		conn.Write([]byte(result))
-	} else {
-		conn.Write([]byte(""))
+		result := []byte(result)
+		conn.Write(result)
 	}
 }

@@ -19,23 +19,33 @@ Battle tested with [ioredis](https://ioredis.readthedocs.io/en/stable/README/).
 > docker-compose up
 ```
 
-## With redis-cli
-
-```
-▶ redis-cli -h localhost -p 26379
-localhost:26379> ping
-PONG
-localhost:26379> sentinel get-master-addr-by-name redis-cluster-master
-1) "127.0.0.1"
-2) "6379"
-```
-
 ## Example of client configuration :
 
 ```
 var redis = new Redis({
   sentinels: [{ host: 'localhost', port: 26379 }],
-  name: 'redis-cluster-master'
+  name: 'master-group-name'
 });
 redis.set('foo', 'bar');
 ```
+
+A full example is available on `example`.
+
+```
+$> cd example
+$> npm install
+$> npm start run
+
+// should display
+> example@1.0.0 start
+> node test.js "run"
+
+bar
+```
+
+You could replace `master-group-name` by your own "master group name".
+You should rename files :
+- "sentinel-get-master-addr-by-name-master-group-name"
+- "sentinel-sentinels-master-group-name"
+
+by you own group name. :)
